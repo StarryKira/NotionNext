@@ -84,8 +84,8 @@ export default function TopBar({ onSearch, onMenuOpen, onToggleDark, isDark }) {
 
   const hasAlgolia = !!siteConfig('ALGOLIA_APP_ID')
 
-  /* Logo source: custom CLAUDEDOCS_LOGO_URL > default Anthropic ✱ */
-  const customLogo = siteConfig('CLAUDEDOCS_LOGO_URL', '', CONFIG)
+  /* Logo source: custom CLAUDEDOCS_LOGO_URL > Notion siteInfo.icon > default Anthropic ✱ */
+  const customLogo = siteConfig('CLAUDEDOCS_LOGO_URL', '', CONFIG) || siteInfo?.icon
   const logoEl = <LogoImage src={customLogo} alt={siteName} />
 
   const handleSearchClick = () => {
