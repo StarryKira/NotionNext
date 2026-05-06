@@ -57,3 +57,14 @@ package-lock.json
 .perf/
 tsconfig.tsbuildinfo
 webpack-internal:/
+
+# Claude Code 本地状态（不入库）
+.claude/
+.playwright-mcp/
+
+# 调试截图（仅根目录，主题内的图不会被忽略）
+/claudedocs-*.png
+/claude-*.png
+/qa-*.png
+/target-*.png
+/real-*.png
