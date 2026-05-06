@@ -2,6 +2,7 @@ import SmartLink from '@/components/SmartLink'
 import { useGlobal } from '@/lib/global'
 import { siteConfig } from '@/lib/config'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import CONFIG from '../config'
 
 /* ── Anthropic ✱ 真实 logo（来自 docs.claude.com 官方 SVG） ── */
@@ -43,6 +44,19 @@ function SunIcon() {
   )
 }
 
+function LogoImage({ src, alt }) {
+  const [errored, setErrored] = useState(false)
+  if (!src || errored) return <AnthropicMark />
+  return (
+    <img
+      src={src}
+      alt={alt}
+      style={{ width: 28, height: 28, objectFit: 'contain', flexShrink: 0, borderRadius: 4 }}
+      onError={() => setErrored(true)}
+    />
+  )
+}
+
 function MenuIcon() {
   return (
     <svg width='18' height='18' viewBox='0 0 16 16' fill='none'
@@ -72,10 +86,7 @@ export default function TopBar({ onSearch, onMenuOpen, onToggleDark, isDark }) {
 
   /* Logo source: custom CLAUDEDOCS_LOGO_URL > default Anthropic ✱ */
   const customLogo = siteConfig('CLAUDEDOCS_LOGO_URL', '', CONFIG)
-  const logoEl = customLogo
-    ? <img src={customLogo} alt={siteName}
-        style={{ width: 28, height: 28, objectFit: 'contain', flexShrink: 0, borderRadius: 4 }} />
-    : <AnthropicMark />
+  const logoEl = <LogoImage src={customLogo} alt={siteName} />
 
   const handleSearchClick = () => {
     if (hasAlgolia && onSearch) {

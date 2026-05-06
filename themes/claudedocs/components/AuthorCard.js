@@ -1,7 +1,7 @@
-import LazyImage from '@/components/LazyImage'
 import { siteConfig } from '@/lib/config'
 import { useGlobal } from '@/lib/global'
 import { decryptEmail } from '@/lib/plugins/mailEncrypt'
+import { useState } from 'react'
 import CONFIG from '../config'
 
 /* Inline social icons (Anthropic-style hairline) */
@@ -51,10 +51,23 @@ function AnthropicMark() {
   )
 }
 
+function AvatarImage({ src, alt }) {
+  const [errored, setErrored] = useState(false)
+  if (!src || errored) return <AnthropicMark />
+  return (
+    <img
+      src={src}
+      alt={alt || 'avatar'}
+      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%', display: 'block' }}
+      onError={() => setErrored(true)}
+    />
+  )
+}
+
 export default function AuthorCard() {
   const { siteInfo } = useGlobal()
   const avatar = siteConfig('CLAUDEDOCS_AVATAR_URL', '', CONFIG) || siteInfo?.icon
-  const name = siteConfig('AUTHOR') || siteInfo?.title
+  const name = siteConfig('AUTHOR') || siteInfo?.author
   const bio = siteConfig('BIO')
   const quote = siteConfig('CLAUDEDOCS_AUTHOR_QUOTE', '', CONFIG)
 
@@ -72,9 +85,7 @@ export default function AuthorCard() {
   return (
     <div className='cd-author-card'>
       <div className='cd-author-avatar'>
-        {avatar
-          ? <LazyImage src={avatar} alt={name || 'avatar'} />
-          : <AnthropicMark />}
+        <AvatarImage src={avatar} alt={name} />
       </div>
       {name && <div className='cd-author-name'>{name}</div>}
       {bio && <div className='cd-author-bio'>{bio}</div>}
