@@ -45,8 +45,15 @@ const LayoutBase = props => {
   useEffect(() => { setMobileOpen(false) }, [router.asPath])
 
   /* ── iframe fallback: 仅当 iframe 完全没触发 load 事件时才视为失败 ──
-     不去检查 contentDocument（跨域必抛 SecurityError，会误判 YouTube/CodeSandbox 等） */
+     不去检查 contentDocument（跨域必抛 SecurityError，会误判 YouTube/CodeSandbox 等）
+     用 Performance API 兜底：fast iframe 在 setup 运行前就 load 完，监听器永远不触发，
+     需要靠 PerformanceResourceTiming.responseEnd 判断它其实已经加载成功 */
   useEffect(() => {
+    const alreadyLoaded = src => {
+      const entries = performance.getEntriesByName(src)
+      const last = entries[entries.length - 1]
+      return !!(last && last.responseEnd > 0)
+    }
     const setup = () => {
       const iframes = document.querySelectorAll(
         '#cd-content-scroll iframe.notion-asset-object-fit'
@@ -54,6 +61,8 @@ const LayoutBase = props => {
       iframes.forEach(iframe => {
         if (iframe.dataset.cdChecked) return
         iframe.dataset.cdChecked = '1'
+
+        if (alreadyLoaded(iframe.src)) return
 
         let loaded = false
         const onLoad = () => { loaded = true }
@@ -63,6 +72,7 @@ const LayoutBase = props => {
         setTimeout(() => {
           if (loaded || iframe.dataset.cdReplaced) return
           if (!iframe.parentNode || !iframe.src) return
+          if (alreadyLoaded(iframe.src)) return
           iframe.dataset.cdReplaced = '1'
           const url = iframe.src
           const fb = document.createElement('div')
