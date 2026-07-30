@@ -1,1 +1,37 @@
+# 依赖：必须排除，否则 COPY . . 会用宿主机平台的 node_modules
+# 覆盖掉镜像内 deps 阶段装好的目标平台依赖（sharp 等原生模块会失配）
+node_modules
+**/node_modules
+
+# 构建产物
 .next*
+out
+build
+
+# 版本控制与 IDE
+.git
+.idea
+.vscode
+
+# 本地状态与缓存
+.claude
+.playwright-mcp
+.tmp
+.perf
+.notion-api-lock
+tsconfig.tsbuildinfo
+coverage
+*.log
+
+# 测试
+__tests__
+
+# 截图
+/claudedocs-*.png
+/claude-*.png
+/qa-*.png
+/target-*.png
+/real-*.png
+
+# 系统文件
+.DS_Store
