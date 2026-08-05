@@ -3,9 +3,11 @@ name: Upstream Sync
 permissions:
   contents: write
 
+# Manual only. The daily schedule was removed because GITHUB_TOKEN is not
+# allowed to push commits that touch .github/workflows/**, so every run failed
+# (and mailed a failure notice) whenever upstream had changed a workflow file.
+# Upstream made the same change in "chore: make upstream sync manual by default".
 on:
-  schedule:
-    - cron: "0 0 * * *" # every day
   workflow_dispatch:
 
 jobs:

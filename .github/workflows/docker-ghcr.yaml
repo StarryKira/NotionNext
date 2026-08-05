@@ -44,6 +44,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # NOTION_PAGE_ID has to be present at *build* time: the Dockerfile runs
+      # `yarn build`, which pre-renders every page from Notion. When it is
+      # missing the build silently falls back to the upstream demo page in
+      # blog.config.js and ships an image with the wrong content.
+      - name: Verify build inputs
+        if: github.event_name != 'pull_request'
+        env:
+          NOTION_PAGE_ID: ${{ vars.NOTION_PAGE_ID || secrets.NOTION_PAGE_ID }}
+        run: |
+          if [ -z "$NOTION_PAGE_ID" ]; then
+            echo "::error::NOTION_PAGE_ID is not set. Add it under Settings -> Secrets and variables -> Actions, otherwise the image is built from the upstream demo Notion page."
+            exit 1
+          fi
+
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
@@ -62,3 +76,9 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Consumed by the ARG/ENV pair in the Dockerfile's builder stage.
+          # NEXT_PUBLIC_* in particular must exist here, not just at runtime,
+          # because Next.js inlines it into the client bundle during the build.
+          build-args: |
+            NOTION_PAGE_ID=${{ vars.NOTION_PAGE_ID || secrets.NOTION_PAGE_ID }}
+            NEXT_PUBLIC_THEME=${{ vars.NEXT_PUBLIC_THEME || secrets.NEXT_PUBLIC_THEME }}
