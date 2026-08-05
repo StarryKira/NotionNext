@@ -38,5 +38,10 @@ module.exports = {
     ext: process.env.NEXT_PUBLIC_NOTION_PROPERTY_EXT || 'ext' // 扩展字段，存放json-string，用于复杂业务
   },
   NOTION_ACTIVE_USER: process.env.NOTION_ACTIVE_USER || '',
-  NOTION_TOKEN_V2: process.env.NOTION_TOKEN_V2 || '' // Useful if you prefer not to make your database public
+  NOTION_TOKEN_V2: process.env.NOTION_TOKEN_V2 || '', // Useful if you prefer not to make your database public
+  // Notion 的接口在 Cloudflare 后面，不带浏览器 User-Agent 的请求会被判定为机器人，
+  // 返回 403 的 Cloudflare 挑战页（而非 Notion 的业务错误）。必须显式携带 UA。
+  NOTION_USER_AGENT:
+    process.env.NOTION_USER_AGENT ||
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 }
